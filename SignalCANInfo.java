@@ -88,6 +88,43 @@ public class SignalCANInfo {
         return ""; // or handle the case when specificID is not found in signalData
     }
 
+    /***
+     * Finds the Hex Value Status using specific CAN IDs within received data.
+     * 
+     * @param receivedData A string containing CAN signal data formatted according to standard.
+     * @param chooseMode An integer representing the selection:
+     *                   0: Hex value status for tset.
+     *                   1: Hex value status for Telltail.
+     *                   2: Hex value status for Vehicle Status.
+     *                   3: Hex value status for Telltail and Vehicle Status.
+     ***/
+    public static void findSpecificIDsForHexValueStatus(String receivedData, int selectMode) {
+        String[] canIdSignalsTable = SpecificCanIdDataset.getSpecificCanIdDatasets(selectMode);
+        String[][] hexValueTable = HexValueLookup.gethexValueTable(selectMode);
+        Map<String, String[]> correspondingTable = HexValueLookup.getCorrespondingTable(canIdSignalsTable, hexValueTable, selectMode);
+
+        String[] dataSets = receivedData.split(";");
+        // Record the specific ID that was processed
+        Set<String> processedIDs = new HashSet<>();
+
+        for (String dataSet : dataSets) {
+            String[] signalData = parseSignalData(dataSet);
+            for (String specificID : canIdSignalsTable) {
+                // Check if a specific ID has already been processed
+                if (!processedIDs.contains(specificID)) {
+                    String hexValue = getHexValue(specificID, signalData);
+                    if (!hexValue.isEmpty()) {
+                        String result = HexValueLookup.getHexValueStatus(specificID, hexValue, correspondingTable);
+                        System.out.println("Hex Value: " + hexValue + "\n");
+                        System.out.println("specificID: " + specificID + "\nStatus: " + result + "\n-----\n");
+                    }
+                    // Add processed specific ID to collection
+                    processedIDs.add(specificID);
+                }
+            }
+        }
+    }
+
     private static void testGetHexValue() { /* Test using a specificID to find the HexValue. */
         String receivedData = "53 01 09 09 00 90 67 1b 00 00 00 00;53 01 09 09 00 90 67 1b 00 00 00 00;53 01 0F 0C 00 90 67 1b 00 00 00 00;53 01 09 09 00 90 57 1b 00 00 00 00;53 01 0F 0C 00 90 67 1b 00 00 00 00;";
         String[] specificID2 = SpecificCanIdDataset.getSpecificCanIdDatasets(0);
@@ -117,33 +154,10 @@ public class SignalCANInfo {
         /* Test using multiple specificIDs to find the hexValue status on receivedDataSets. */
         String receivedData = "53 01 09 09 00 90 67 1b 00 00 00 00;53 01 09 09 00 90 67 1b 00 00 00 00;53 01 0F 0C 00 90 67 1b 00 00 00 00;53 01 09 09 00 90 57 1b 00 00 00 00;53 01 0F 0C 00 90 67 1b 00 00 00 00;";
         int selectMode = 0;
-        String[] canIdSignalsTable = SpecificCanIdDataset.getSpecificCanIdDatasets(selectMode);
-        String[][] hexValueTable = HexValueLookup.gethexValueTable(selectMode);
-        Map<String, String[]> correspondingTable = HexValueLookup.getCorrespondingTable(canIdSignalsTable, hexValueTable, selectMode);
-
-        String[] dataSets = receivedData.split(";");
-        // Record the specific ID that was processed
-        Set<String> processedIDs = new HashSet<>();
-
-        for (String dataSet : dataSets) {
-            String[] signalData = parseSignalData(dataSet);
-            for (String specificID : canIdSignalsTable) {
-                // Check if a specific ID has already been processed
-                if (!processedIDs.contains(specificID)) {
-                    String hexValue = getHexValue(specificID, signalData);
-                    if (!hexValue.isEmpty()) {
-                        String result = HexValueLookup.getHexValueStatus(specificID, hexValue, correspondingTable);
-                        System.out.println("Hex Value: " + hexValue + "\n");
-                        System.out.println("specificID: " + specificID + "\nStatus: " + result + "\n-----\n");
-                    }
-                    // Add processed specific ID to collection
-                    processedIDs.add(specificID);
-                }
-            }
-        }
+        findSpecificIDsForHexValueStatus(receivedData, selectMode);
     }
 
     public static void main(String[] args) {
-        //testSpecificIDsForHexValueStatus();
+        testSpecificIDsForHexValueStatus();
     }
 }
