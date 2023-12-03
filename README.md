@@ -1,4 +1,4 @@
-# lookupCanId
+# Lookup CAN ID 
 Provide lookup CAN ID and get Hex Value Status class function with Java language.
 
 ## chooseMode = 0 
