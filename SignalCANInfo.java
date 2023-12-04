@@ -3,9 +3,10 @@ package lookupCanId;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Queue;
 
 public class SignalCANInfo {
-    /***
+    /**
      * Parses the dataSet and extracts signal information.
      *
      * @param dataSet A string containing signal data separated by ';'.
@@ -13,7 +14,7 @@ public class SignalCANInfo {
      *         [0]: Signal data in its original format.
      *         [1]: The formatted can ID.
      *         [2]: The extracted can data.
-     ***/
+     */
     public static String[] parseSignalData(String dataSet) {
         // Get signalInfo
         String[] data = dataSet.split(" ");
@@ -45,13 +46,13 @@ public class SignalCANInfo {
         return new String[] { signalInfo, canID, canData };
     }
 
-    /***
+    /**
      * Calculates the hexadecimal value based on specificID and signalData.
      *
      * @param specificID A string containing specific ID, start bit, and length.
      * @param signalData An array containing parsed signal information.
      * @return The calculated hexadecimal value.
-     ***/
+     */
     public static String getHexValue(String specificID, String[] signalData) {
         String[] specificIDParts = specificID.split(", ");
         String myCanID = specificIDParts[0];
@@ -88,20 +89,22 @@ public class SignalCANInfo {
         return ""; // or handle the case when specificID is not found in signalData
     }
 
-    /***
+    /**
      * Finds the Hex Value Status using specific CAN IDs within received data.
      * 
-     * @param receivedData A string containing CAN signal data formatted according to standard.
-     * @param chooseMode An integer representing the selection:
-     *                   0: Hex value status for tset.
-     *                   1: Hex value status for Telltail.
-     *                   2: Hex value status for Vehicle Status.
-     *                   3: Hex value status for Telltail and Vehicle Status.
-     ***/
+     * @param receivedData A string containing CAN signal data formatted according
+     *                     to standard.
+     * @param chooseMode   An integer representing the selection:
+     *                     0: Hex value status for tset.
+     *                     1: Hex value status for Telltail.
+     *                     2: Hex value status for Vehicle Status.
+     *                     3: Hex value status for Telltail and Vehicle Status.
+     */
     public static void findSpecificIDsForHexValueStatus(String receivedData, int selectMode) {
         String[] canIdSignalsTable = SpecificCanIdDataset.getSpecificCanIdDatasets(selectMode);
         String[][] hexValueTable = HexValueLookup.gethexValueTable(selectMode);
-        Map<String, String[]> correspondingTable = HexValueLookup.getCorrespondingTable(canIdSignalsTable, hexValueTable, selectMode);
+        Map<String, String[]> correspondingTable = HexValueLookup.getCorrespondingTable(canIdSignalsTable,
+                hexValueTable, selectMode);
 
         String[] dataSets = receivedData.split(";");
         // Record the specific ID that was processed
@@ -125,7 +128,8 @@ public class SignalCANInfo {
         }
     }
 
-    private static void testGetHexValue() { /* Test using a specificID to find the HexValue. */
+    /** Test using a specificID to find the HexValue. */
+    private static void testGetHexValue() { 
         String receivedData = "53 01 09 09 00 90 67 1b 00 00 00 00;53 01 09 09 00 90 67 1b 00 00 00 00;53 01 0F 0C 00 90 67 1b 00 00 00 00;53 01 09 09 00 90 57 1b 00 00 00 00;53 01 0F 0C 00 90 67 1b 00 00 00 00;";
         String[] specificID2 = SpecificCanIdDataset.getSpecificCanIdDatasets(0);
         String myTestInput = specificID2[0]; // "0x199, 26, 3"
@@ -139,7 +143,8 @@ public class SignalCANInfo {
         }
     }
 
-    private static void testGetHexValueStatus() { /* Test using a specificID to find the HexValueStatus. */
+    /** Test using a specificID to find the HexValueStatus. */
+    private static void testGetHexValueStatus() { 
         int selectMode = 0;
         String[][] hexValueTable = HexValueLookup.gethexValueTable(selectMode);
         String[] canIdSignalsTable = SpecificCanIdDataset.getSpecificCanIdDatasets(selectMode);
@@ -150,14 +155,35 @@ public class SignalCANInfo {
         System.out.println("specificID: " + specificID + "\nStatus: " + hexValueStatus);
     }
 
-    private static void testSpecificIDsForHexValueStatus(){
-        /* Test using multiple specificIDs to find the hexValue status on receivedDataSets. */
+    /** Test using multiple specificIDs to find the hexValue status on receivedDataSets. */
+    private static void testSpecificIDsForHexValueStatus() { 
         String receivedData = "53 01 09 09 00 90 67 1b 00 00 00 00;53 01 09 09 00 90 67 1b 00 00 00 00;53 01 0F 0C 00 90 67 1b 00 00 00 00;53 01 09 09 00 90 57 1b 00 00 00 00;53 01 0F 0C 00 90 67 1b 00 00 00 00;";
         int selectMode = 0;
         findSpecificIDsForHexValueStatus(receivedData, selectMode);
     }
 
+    /**
+     * Test receiving simulated CAN signals to find Hex Value status with queue length.
+     * This test aims to simulate the reception of CAN signals, organize them into a
+     * queue,
+     * and find the Hex Value status based on the queued data. It verifies the
+     * functionality
+     * of parsing signals, managing the queue, and extracting Hex Value status based
+     * on
+     * predefined IDs from the received data.
+     */
+    private static void testSignalQueueHexValueStatus() {
+        int count = 255;
+        int selectMode = 0;
+        String inputSimulateCanSignals = SignalReceiver.simulateCanSignals(count);
+        Queue<String> tmpSignalQueue = SignalReceiver.getSignalQueue(inputSimulateCanSignals);
+        String aString = SignalReceiver.getQueueToString(tmpSignalQueue);
+        System.out.println("aString: " + aString);
+        SignalCANInfo.findSpecificIDsForHexValueStatus(aString, selectMode);
+    }
+
     public static void main(String[] args) {
-        testSpecificIDsForHexValueStatus();
+        //testSpecificIDsForHexValueStatus();
+        testSignalQueueHexValueStatus();
     }
 }
