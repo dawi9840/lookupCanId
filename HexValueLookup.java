@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HexValueLookup {
-    /***
+    /**
      * Retrieves custom hex value tables based on the chosen mode.
      *
      * @param chooseMode An integer representing the selection:
@@ -13,7 +13,7 @@ public class HexValueLookup {
      *                   2: Hex value table for Vehicle Status.
      *                   3: Hex value table for Telltail and Vehicle Status.
      * @return A 2D array containing hex value table.
-     ***/
+     */
     public static String[][] gethexValueTable(int chooseMode) {
         if (chooseMode == 0) { /* For tset hexValueTable */
             String[][] hexValueTable = {
@@ -87,7 +87,7 @@ public class HexValueLookup {
         return new String[0][0]; // Return empty array
     }
 
-    /***
+    /**
      * Retrieves a custom corresponding table by mapping indexes from
      * canIdSignalsTable to hexValueTables based on the chosen mode.
      *
@@ -100,7 +100,7 @@ public class HexValueLookup {
      *                          3: Choose correspondingTable for Telltail and
      *                          Vehicle Status.
      * @return A map containing the corresponding table.
-     ***/
+     */
     public static Map<String, String[]> getCorrespondingTable(String[] canIdSignalsTable, String[][] hexValueTable, int chooseMode) {
         Map<String, String[]> correspondingTable = new HashMap<>();
         switch (chooseMode) {
@@ -150,16 +150,16 @@ public class HexValueLookup {
         return correspondingTable;
     }
 
-    /***
+    /**
      * Retrieves the status information corresponding to a specific ID and
      * hexadecimal value from the provided corresponding table.
      *
      * @param specificID         The specific ID to search for in the corresponding table.
      * @param hexValue           The hexadecimal value to match in the corresponding table entry.
      * @param correspondingTable The mapping table containing IDs and their associated hex value arrays.
-     * @return The status information associated with the specific ID and hexadecimal value, or
+     * @return The status information associated with the specific ID and hexadecimal value, or 
      * "Not found" if no matching entry is found in the corresponding table.
-     ***/
+     */
     public static String getHexValueStatus(String specificID, String hexValue, Map<String, String[]> correspondingTable) {
         for (Map.Entry<String, String[]> entry : correspondingTable.entrySet()) {
             if (specificID.equals(entry.getKey())) {
@@ -175,7 +175,8 @@ public class HexValueLookup {
         return "Not found";
     }
 
-    private static void testGetHexValueStatus() {  /* Test using a specificID to find the HexValueStatus. */
+     /** Test using a specificID to find the HexValueStatus. */
+    private static void testGetHexValueStatus() { 
         int selectMode = 0;
         String[][] hexValueTable = gethexValueTable(selectMode);
         String[] canIdSignalsTable = SpecificCanIdDataset.getSpecificCanIdDatasets(selectMode);
