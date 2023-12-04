@@ -175,7 +175,7 @@ public class HexValueLookup {
         return "Not found";
     }
 
-     /** Test using a specificID to find the HexValueStatus. */
+    /** Test using a specificID to find the HexValueStatus. */
     private static void testGetHexValueStatus() { 
         int selectMode = 0;
         String[][] hexValueTable = gethexValueTable(selectMode);
