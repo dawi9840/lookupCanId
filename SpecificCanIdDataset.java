@@ -1,7 +1,7 @@
 package lookupCanId;
 
 public class SpecificCanIdDataset {
-    /***
+    /**
      * Retrieves custom specific CAN ID signal datasets based on the chosen mode.
      *
      * @param chooseMode An integer representing the selection:
@@ -10,7 +10,7 @@ public class SpecificCanIdDataset {
      *                   2: Specific CAN ID for Vehicle Status.
      *                   3: Specific CAN ID for Telltail and Vehicle Status.
      * @return A String array containing signal specific CAN ID.
-     ***/
+     **/
     public static String[] getSpecificCanIdDatasets(int chooseMode) {
         if (chooseMode == 0) { /* For tset CAN ID */
             String[] canIdSignals = { "0x199, 26, 3", "0x199, 13, 2", "0x199, 17, 2", "0x199, 19, 2" };
@@ -64,7 +64,8 @@ public class SpecificCanIdDataset {
         return new String[0]; // Return empty array
     }
 
-    private static void testGetSpecificCanIdDataSet() { /* Test get a Specific CAN ID dataset. */
+    /** Test get a Specific CAN ID dataset. */
+    private static void testGetSpecificCanIdDataSet() { 
         int selectMode = 0;
         String[] SpecificCanIds = getSpecificCanIdDatasets(selectMode);
         for (String canIDSet : SpecificCanIds) {
