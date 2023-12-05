@@ -20,7 +20,7 @@ public class SpecificCanIdDataset {
             String[] canIdSignals = {
                     "0x217, 18, 1", // Low beam (on/off)
                     "0x217, 17, 1", // High beam (on/off)
-                    "0x217, 43, 1", // Front fog lamp (on/off)
+                    "0x217, 43, 1", // Front fog lamp (on/off), head and tail lights are the same CAN ID
                     "0x217, 50, 1", // Left direction light (on/off), head and tail lights are the same CAN ID
                     "0x217, 49, 1", // Right direction light (on/off), head and tail lights are the same CAN ID
                     "0x217, 41, 1", // Rear fog light (on/off)
@@ -45,7 +45,7 @@ public class SpecificCanIdDataset {
             String[] canIdSignals = {
                     "0x217, 18, 1", // Low beam (on/off)
                     "0x217, 17, 1", // High beam (on/off)
-                    "0x217, 43, 1", // Front fog lamp (on/off)
+                    "0x217, 43, 1", // Front fog lamp (on/off), head and tail lights are the same CAN ID
                     "0x217, 50, 1", // Left direction light (on/off), head and tail lights are the same CAN ID
                     "0x217, 49, 1", // Right direction light (on/off), head and tail lights are the same CAN ID
                     "0x217, 41, 1", // Rear fog light (on/off)
