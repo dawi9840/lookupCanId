@@ -162,12 +162,20 @@ public class HexValueLookup {
      */
     public static String getHexValueStatus(String specificID, String hexValue, Map<String, String[]> correspondingTable) {
         for (Map.Entry<String, String[]> entry : correspondingTable.entrySet()) {
+            // Check whether a specific ID matches the Key of the current Map entry
             if (specificID.equals(entry.getKey())) {
                 String[] hexValueTable = entry.getValue();
-                for (String entryValue : hexValueTable) {
-                    String[] parts = entryValue.split("=");
-                    if (parts.length == 2 && parts[0].equals(hexValue)) {
-                        return entryValue;
+                // Check whether the corresponding value array is null
+                if (hexValueTable != null) {
+                    for (String entryValue : hexValueTable) {
+                        // Check if each entryValue is null
+                        if (entryValue != null) {
+                            String[] parts = entryValue.split("=");
+                            // Check length of parts array to avoid ArrayIndexOutOfBoundsException
+                            if (parts.length >= 2 && parts[0].equals(hexValue)) {
+                                return entryValue;
+                            }
+                        }
                     }
                 }
             }
