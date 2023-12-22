@@ -64,16 +64,16 @@ public class SpecificSignalDatasetForQML {
         if(mode == 0){
             testSig = testGetSpecificSignal(0, 0);
             testStatus = testGetLightStatus(0);
-            System.out.println("mode: " + mode + "\n");
-            System.out.println("Signal: " + testSig + "\n"); 
+            System.out.println("mode: " + mode);
+            System.out.println("Signal: " + testSig); 
             System.out.println("Light status: " + testStatus + "\n");
         }
         
         if(mode == 1){
             testSig = testGetSpecificSignal(0, 1);
             testStatus = testGetLightStatus(1);
-            System.out.println("mode: " + mode + "\n");
-            System.out.println("Signal: " + testSig + "\n"); 
+            System.out.println("mode: " + mode);
+            System.out.println("Signal: " + testSig); 
             System.out.println("Light status: " + testStatus + "\n");
         }
     }
