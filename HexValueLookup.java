@@ -195,7 +195,14 @@ public class HexValueLookup {
         System.out.println("specificID: " + specificID + "\nStatus: " + hexValueStatus);
     }
 
+    private static void testGetAHexValueFromhexValueTable(){
+        int selectMode = 3;
+        String telltailOnString = getHexValueTable(selectMode)[0][0];
+        System.out.println("telltail status: " + telltailOnString + "\n");
+    }
+
     public static void main(String[] args) {
         //testGetHexValueStatus();
+        //testGetAHexValueFromhexValueTable();
     }
 }
