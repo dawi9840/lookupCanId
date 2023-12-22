@@ -56,7 +56,30 @@ public class SpecificSignalDatasetForQML {
         System.out.println("Light status: " + testLightStatus + "\n");
     }
 
+    private static void testCase2ControlLightStatus(){
+        String testSig;
+        String testStatus;
+        int mode = 0;
+
+        if(mode == 0){
+            testSig = testGetSpecificSignal(0, 0);
+            testStatus = testGetLightStatus(0);
+            System.out.println("mode: " + mode + "\n");
+            System.out.println("Signal: " + testSig + "\n"); 
+            System.out.println("Light status: " + testStatus + "\n");
+        }
+        
+        if(mode == 1){
+            testSig = testGetSpecificSignal(0, 1);
+            testStatus = testGetLightStatus(1);
+            System.out.println("mode: " + mode + "\n");
+            System.out.println("Signal: " + testSig + "\n"); 
+            System.out.println("Light status: " + testStatus + "\n");
+        }
+    }
+
     public static void main(String[] args) {
         testCase1ToGetSignalAndLightStatus();
+        testCase2ControlLightStatus();
     }
 }
