@@ -4,31 +4,31 @@ public class SpecificSignalDatasetForQML {
             String[] signalsStrArr = {       // (on/off)
                     "Low_Beam_Light",        // "0x217, 18, 1"
                     "High_Beam_Light",       // "0x217, 17, 1"
-                    "Front_Fog_Lamp",        // "0x217, 43, 1", head and tail lights are the same signal name
-                    "Left_Direction_Light",  // "0x217, 50, 1", head and tail lights are the same signal name
-                    "Right_Direction_Light", // "0x217, 49, 1", head and tail lights are the same signal name
-                    "Rear_Fog_Light",        // "0x217, 41, 1"
+                    "Fog_Light_Front",       // "0x217, 43, 1", head and tail lights are the same signal name
+                    "Direction_Light_Left",  // "0x217, 50, 1", head and tail lights are the same signal name
+                    "Direction_Light_Right", // "0x217, 49, 1", head and tail lights are the same signal name
+                    "Fog_Light_Rear",        // "0x217, 41, 1"
                     "Warning_Light_HAZARD",  // "0x500, 48, 1"
             };
             return signalsStrArr;
         }
         if (chooseMode == 1) {/* Vehicle Status signals */
             String[] signalsStrArr = {
-                    "PRND_P",                  // "0x199, 13, 2", Park light
-                    "PRND_R",                  // "0x199, 15, 2", Reverse lights
-                    "PRND_N",                  // "0x199, 17, 2", Neutral light
-                    "PRND_D",                  // "0x199, 19, 2", Drive light
-                    "Outdoor_temperature",     // "0x40A, 31, 8", Outdoor temperature
-                    "Speed",                   // "0x217, 39, 13", Speed
-                    "Battery_Level_SOC",       // "0x403, 23, 8", Battery level SOC
-                    "Driving_Mileage",         // "0x403. 25, 10", Driving mileage
+                    "gear_p",                // "0x199, 13, 2", Park light
+                    "gear_r",                // "0x199, 15, 2", Reverse lights
+                    "gear_n",                // "0x199, 17, 2", Neutral light
+                    "gear_d",                // "0x199, 19, 2", Drive light
+                    "Outdoor_temperature",   // "0x40A, 31, 8", Outdoor temperature
+                    "Speed",                 // "0x217, 39, 13", Speed
+                    "Battery_Level_SOC",     // "0x403, 23, 8", Battery level SOC
+                    "Driving_Mileage",       // "0x403. 25, 10", Driving mileage
             };
             return signalsStrArr;
         }
         if (chooseMode == 2) {/* DMS signals*/
             String[] signalsStrArr = {
-                "Auto_Brake",
-                "Time_Of_A_Brake",
+                "Time_For_A_Brake",          // "0x700, 18, 1", Yaw
+                "Focus_On_Driving",          // "0x700, 19, 1", PhoneCall
             };
             return signalsStrArr;
         }
@@ -38,6 +38,12 @@ public class SpecificSignalDatasetForQML {
     public static String[] getLightStatus(){
         /* Telltail signals */
         String[] statusArr = {"Opened", "Closed"};
+        return statusArr;
+    }
+
+    public static String[] getDmsStatus(){
+        /* DMS signals */
+        String[] statusArr = {"Alarm", "NotAlarm"};
         return statusArr;
     }
 
@@ -68,7 +74,7 @@ public class SpecificSignalDatasetForQML {
             System.out.println("Signal: " + testSig); 
             System.out.println("Light status: " + testStatus + "\n");
         }
-        
+
         if(mode == 1){
             testSig = testGetSpecificSignal(0, 1);
             testStatus = testGetLightStatus(1);
@@ -80,6 +86,6 @@ public class SpecificSignalDatasetForQML {
 
     public static void main(String[] args) {
         testCase1ToGetSignalAndLightStatus();
-        testCase2ControlLightStatus();
+        // testCase2ControlLightStatus();
     }
 }
