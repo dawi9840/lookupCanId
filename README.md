@@ -20,4 +20,9 @@ CAN signals detailed info table of Vehicle status.
 
 
 ### chooseMode = 3 
-CAN signals detailed info table of mixing Telltale status and Vehicle status. See as the source code. 
+CAN signals detailed info table of mixing Telltale, Vehicle status, and DMS 2 status. See as the source code.  
+
+### chooseMode = 4 
+CAN signals detailed info table of DMS status.  
+![Screenshot 2023-12-28 002943](https://github.com/dawi9840/lookupCanId/assets/19554347/07cad773-0399-48bb-b75e-1b765975397f)  
+
