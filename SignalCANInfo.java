@@ -55,6 +55,10 @@ public class SignalCANInfo {
      */
     public static String getHexValue(String specificID, String[] signalData) {
         String[] specificIDParts = specificID.split(", ");
+        if (specificIDParts.length < 3) {
+            // Handle the case where specificIDParts is insufficient in length and return empty
+            return "";
+        }
         String myCanID = specificIDParts[0];
         String myStartBit = specificIDParts[1];
         String myLength = specificIDParts[2];
@@ -91,14 +95,14 @@ public class SignalCANInfo {
 
     /**
      * Finds the Hex Value Status using specific CAN IDs within received data.
-     * 
-     * @param receivedData A string containing CAN signal data formatted according
-     *                     to standard.
-     * @param chooseMode   An integer representing the selection:
-     *                     0: Hex value status for tset.
-     *                     1: Hex value status for Telltail.
-     *                     2: Hex value status for Vehicle Status.
-     *                     3: Hex value status for Telltail and Vehicle Status.
+     *
+     * @param receivedData A string containing CAN signal data formatted according to standard.
+     * @param selectMode An integer representing the selection:
+     *                   0: Hex value status for tset.
+     *                   1: Hex value status for Telltail.
+     *                   2: Hex value status for Vehicle Status.
+     *                   3: Hex value status for Telltail, Vehicle Status and DMS status.
+     *                   4: Hex value status for DMS Status.
      */
     public static void findSpecificIDsForHexValueStatus(String receivedData, int selectMode) {
         String[] canIdSignalsTable = SpecificCanIdDataset.getSpecificCanIdDatasets(selectMode);
@@ -126,6 +130,11 @@ public class SignalCANInfo {
                 }
             }
         }
+    }
+
+    public static int convertHexValueToDecimalValue(String hexValue){
+        String trimmedString = hexValue.substring(2);
+        return Integer.parseInt(trimmedString, 16);
     }
 
     /** Test using a specificID to find the HexValue. */
@@ -183,7 +192,7 @@ public class SignalCANInfo {
     }
 
     public static void main(String[] args) {
-        //testSpecificIDsForHexValueStatus();
-        testSignalQueueHexValueStatus();
+        testSpecificIDsForHexValueStatus();
+        //testSignalQueueHexValueStatus();
     }
 }
