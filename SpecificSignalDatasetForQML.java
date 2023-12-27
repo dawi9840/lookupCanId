@@ -57,6 +57,10 @@ public class SpecificSignalDatasetForQML {
         return getLightStatus()[index];
     }
 
+    public static String testGetDmsStatus(int index){
+        return getLightStatus()[index];
+    }
+
     private static void testCase1ToGetSignalAndLightStatus(){
         String testSignal = testGetSpecificSignal(0, 0);
         String testLightStatus = testGetLightStatus(0);
