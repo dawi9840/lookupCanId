@@ -58,7 +58,7 @@ public class SignalCANInfo {
         // System.out.println("canIDTmp_Remove header: " + canIDTmp);
 
         // Get canData
-        String[] canDataArray = new String[8];
+        String[] canDataArray = new String[8];  
         System.arraycopy(data, 4, canDataArray, 0, 8);
         String canData = String.join(" ", canDataArray);
 
@@ -70,7 +70,7 @@ public class SignalCANInfo {
             int intValue = Integer.parseInt(value, 16);
             processedCanIDTmp.append(Integer.toHexString(intValue));
         }
-        String canID = "0x" + processedCanIDTmp.toString();
+        String canID = "0x" + processedCanIDTmp.toString().toUpperCase();
 
         // System.out.println("signalInfo: " + signalInfo);
         // System.out.println("canID: " + canID);
@@ -570,17 +570,23 @@ public class SignalCANInfo {
     }
 
     private static void dawi_test(){
+        String receivedData = "54 02 01 05 00 00 00 00 00 00 00 00;"; // front Fog off
+        // String receivedData = "54 04 00 0A 00 00 00 3E 00 00 00 00;"; // ODU: 62 degC
+        // String receivedData = "54 02 01 07 00 00 00 00 6F 20 00 00;"; // low beam:off; high beam:off;speed: 0 km/h;
+        // String receivedData = "54 02 01 07 00 00 00 00 C2 70 00 00;"; // speed: 0 km/h;high beam:off;LD:off; RD:off; rear fog:off; 
+        // String receivedData = "54 04 00 03 00 00 32 02 08 00 00 00;"; // DM: 520 km/h; soc:20%; DM:50 km;
+
         // String receivedData = "54 02 01 07 00 00 04 00 00 00 00 00;"; // low beam on
-        // String receivedData = "54 02 01 07 00 00 00 00 00 00 00 00;"; // low beam off; High beam off;;Speed: 0 km/h;
+        // String receivedData = "54 02 01 07 00 00 00 00 00 00 00 00;"; // low beam off; high beam off;;Speed: 0 km/h;
         // String receivedData = "54 01 09 09 00 10 00 00 00 00 00 00;"; // gear_P:0x1=Switch Pressed; (gear_R, gera_N, gear_D):0x0=Switch Released; 
         // String receivedData = "54 01 09 09 00 40 00 00 00 00 00 00;"; // gear_R:0x1=Switch Pressed; (gear_P, gera_N, gear_D):0x0=Switch Released;
         // String receivedData = "54 01 09 09 00 00 01 00 00 00 00 00;"; // gera_N:0x1=Switch Pressed; (gear_P,gear_R, gear_D):0x0=Switch Released; 
         // String receivedData = "54 01 09 09 00 00 04 00 00 00 00 00;"; // gear_D: 0x1=Switch Pressed; (gear_P, gear_R, gera_N):0x0=Switch Released;
         
-        // String receivedData = "54 04 00 03 00 00 00 00 C8 00 00 00 ;"; // DM: 0 km/h; Soc:0 %;
-        String receivedData = "54 04 00 03 00 00 A7 00 00 00 00 00;"; // Soc: 67%; Driving mileage: 167 km;
-        // String receivedData = "54 04 00 03 00 00 C8 00 00 00 00 00;"; // SOC: 80 %, Driving mileage: 200 km;
-        // String receivedData = "54 04 00 03 00 00 00 02 A6 00 00 00;"; // Driving mileage: 0 km; soc: 0 %;
+        // String receivedData = "54 04 00 03 00 00 A7 00 00 00 00 00;"; // Soc: 67%; DM: 167 km;
+        // String receivedData = "54 04 00 03 00 00 C8 00 00 00 00 00;"; // SOC: 80 %, DM: 200 km;
+        // String receivedData = "54 04 00 03 00 00 00 02 A6 00 00 00;"; // DM: 0 km; soc: 0 %;
+        // String receivedData = "54 04 00 03 00 00 00 00 C8 00 00 00;"; // DM: 0 km/h; Soc:0 %;
         // String receivedData = "54 02 01 07 00 00 00 00 6F 20 00;"; // data length less 35 Unicode characters
 
         // Record the specific ID that was processed
@@ -589,6 +595,7 @@ public class SignalCANInfo {
         String[] dataSets = receivedData.split(";");
 
         for (String dataSet : dataSets) {
+            // System.out.println("length: " + receivedData.length());
             // System.out.println("dataSet: " + dataSet);
             if(dataSet.length() >= 35){
                 String[] signalData = SignalCANInfo_parseSignalData(dataSet);
