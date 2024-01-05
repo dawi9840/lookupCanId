@@ -40,7 +40,7 @@ public class SignalCANInfo {
         }
 
         // Create canID
-        String canID = "0x" + processedCanIDTmp.toString();
+        String canID = "0x" + processedCanIDTmp.toString().toUpperCase();
 
         // Return values in an array
         return new String[] { signalInfo, canID, canData };
