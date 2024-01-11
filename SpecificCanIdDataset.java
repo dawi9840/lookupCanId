@@ -40,7 +40,7 @@ public class SpecificCanIdDataset {
                     "0x199, 15, 2",  // PRND_R Reverse light
                     "0x199, 17, 2",  // PRND_N Neutral light
                     "0x199, 19, 2",  // PRND_D Drive light
-                    "0x40A, 31, 8",  // Outdoor temperature
+                    "0x40a, 31, 8",  // Outdoor temperature
                     "0x217, 39, 13", // Speed
                     "0x403, 23, 8",  // Battery level SOC
                     "0x403, 25, 10", // Driving mileage
@@ -60,7 +60,7 @@ public class SpecificCanIdDataset {
                     "0x199, 15, 2",  // 8.PRND_R Reverse light
                     "0x199, 17, 2",  // 9.PRND_N Neutral light
                     "0x199, 19, 2",  // 10.PRND_D Drive light
-                    "0x40A, 31, 8",  // 11.Outdoor temperature
+                    "0x40a, 31, 8",  // 11.Outdoor temperature
                     "0x217, 39, 13", // 12.Speed
                     "0x403, 23, 8",  // 13.Battery level SOC
                     "0x403, 25, 10", // 14.Driving mileage
