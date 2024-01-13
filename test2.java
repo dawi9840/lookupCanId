@@ -708,19 +708,18 @@ public class SignalCANInfo {
                     System.out.println(i + ", myCanID: " + myCanID + "\n");
                     // System.out.println("InputCanID: " + signalData[1] + "\n");
 
+                    String hexValue = SignalCANInfo_getHexValue(canIdSignalsTable_[i], signalData);
+
                     if(LeftAndRightDirectionAndHazardCondition(signalData, myCanID, myStartBit)){
                         // System.out.println( i + "0x427_(myCanID, myStartBit): (" + myCanID + ", " + myStartBit + ")");
                         // Caculate hexValueStatus of low/hight direction, and hazard light status.
                         if(myStartBit.equals(startBitLeftDirection)){
-                            String hexValue = SignalCANInfo_getHexValue(canIdSignalsTable_[i], signalData);
                             leftDirectionLightStatus = HexValueLookup_getHexValueStatus(canIdSignalsTable_[i], hexValue, correspondingTable_);
                             System.out.println( "leftDirectionLightStatus: " + leftDirectionLightStatus + "\n");
                         }else if(myStartBit.equals(startBitRightDirection)){
-                            String hexValue = SignalCANInfo_getHexValue(canIdSignalsTable_[i], signalData);
                             rightDirectionLightStatus = HexValueLookup_getHexValueStatus(canIdSignalsTable_[i], hexValue, correspondingTable_);
                             System.out.println("rightDirectionLightStatus: " + rightDirectionLightStatus + "\n");
                         }else if(myStartBit.equals(startBitHazard)){
-                            String hexValue = SignalCANInfo_getHexValue(canIdSignalsTable_[i], signalData);
                             hazardLightStatus = HexValueLookup_getHexValueStatus(canIdSignalsTable_[i], hexValue, correspondingTable_);
                             System.out.println("hazardLightStatus: " + hazardLightStatus + "\n");
                         }else{//exception
@@ -747,11 +746,9 @@ public class SignalCANInfo {
                         //System.out.println( i + "0x217_(myCanID, myStartBit): (" + myCanID + ", " + myStartBit + ")");
                         // Caculate hexValueStatus of low/hight beam light status.
                         if(myStartBit.equals(startBitLowBeam)){// low beam
-                            String hexValue = SignalCANInfo_getHexValue(canIdSignalsTable_[i], signalData);
                             lowBeanLightStatus = HexValueLookup_getHexValueStatus(canIdSignalsTable_[i], hexValue, correspondingTable_);
                             System.out.println( "lowBeanLightStatus: " + lowBeanLightStatus + "\n");
                         }else if(myStartBit.equals(startBitHighBeam)){// high beam
-                            String hexValue = SignalCANInfo_getHexValue(canIdSignalsTable_[i], signalData);
                             highBeanLightStatus = HexValueLookup_getHexValueStatus(canIdSignalsTable_[i], hexValue, correspondingTable_);
                             System.out.println("highBeanLightStatus: " + highBeanLightStatus + "\n");
                         }else{//exception
@@ -776,7 +773,6 @@ public class SignalCANInfo {
                         System.out.println("InputCanData: " + signalData[2]);
                         System.out.println(i + " , (myCanID, myStartBit, myLength): (" + myCanID + ", " + myStartBit + ", " + myLength + ")\n");
 
-                        String hexValue = SignalCANInfo_getHexValue(canIdSignalsTable_[i], signalData);
                         String hexValueStatus = HexValueLookup_getHexValueStatus(canIdSignalsTable_[i], hexValue, correspondingTable_);
 
                         if(!hexValue.isEmpty()){
@@ -828,31 +824,7 @@ public class SignalCANInfo {
             // invokeSendToQtSignalChange(telltaleLight, qmlStatusLightOff);
             System.out.println("Light: " + telltaleLight + ", Status: " + qmlStatusLightOff + "\n");
         }
-/*
-        // 3.Left direction light (on/off), head and tail lights are the same CAN ID
-        if(specificID.equals(idLeftDirection) && hexValueStatus.equals(statusLightOn)){
-            telltaleLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 3);
-            // invokeSendToQtSignalChange(telltaleLight, qmlStatusLightOn);
-            System.out.println("Light: " + telltaleLight + ", Status: " + qmlStatusLightOn + "\n");
-        }
-        if(specificID.equals(idLeftDirection) && hexValueStatus.equals(statusLightOff)){
-            telltaleLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 3);
-            // invokeSendToQtSignalChange(telltaleLight, qmlStatusLightOff);
-            System.out.println("Light: " + telltaleLight + ", Status: " + qmlStatusLightOff + "\n");
-        }
-        
-        // 4.Right direction light (on/off), head and tail lights are the same CAN ID
-        if(specificID.equals(idRightDirection) && hexValueStatus.equals(statusLightOn)){
-            telltaleLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 4);
-            // invokeSendToQtSignalChange(telltaleLight, qmlStatusLightOn);
-            System.out.println("Light: " + telltaleLight + ", Status: " + qmlStatusLightOn + "\n");
-        }
-        if(specificID.equals(idRightDirection) && hexValueStatus.equals(statusLightOff)){
-            telltaleLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 4);
-            // invokeSendToQtSignalChange(telltaleLight, qmlStatusLightOff);
-            System.out.println("Light: " + telltaleLight + ", Status: " + qmlStatusLightOff + "\n");
-        }
-*/
+
         // 5.Rear fog light (on/off)
         if(specificID.equals(idRearFog) && hexValueStatus.equals(statusLightOn)){
             telltaleLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 5);
@@ -864,19 +836,7 @@ public class SignalCANInfo {
             // invokeSendToQtSignalChange(telltaleLight, qmlStatusLightOff);
             System.out.println("Light: " + telltaleLight + ", Status: " + qmlStatusLightOff + "\n");
         }
-/*
-        // 6.Warning light HAZARD (on/off)
-        if(specificID.equals(idHazard) && hexValueStatus.equals(statusLightOn)){
-            telltaleLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 6);
-            // invokeSendToQtSignalChange(telltaleLight, qmlStatusLightOn);
-            System.out.println("Light: " + telltaleLight + ", Status: " + qmlStatusLightOn + "\n");
-        }
-        if(specificID.equals(idHazard) && hexValueStatus.equals(statusLightOff)){
-            telltaleLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 6);
-            // invokeSendToQtSignalChange(telltaleLight, qmlStatusLightOff);
-            System.out.println("Light: " + telltaleLight + ", Status: " + qmlStatusLightOff + "\n");
-        }
-*/
+
         if(!telltaleLight.equals("")){
             System.out.println("Input specificID: " + specificID);
         }
