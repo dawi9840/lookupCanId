@@ -778,7 +778,7 @@ public class SignalCANInfo {
                         if(!hexValue.isEmpty()){
                             System.out.println("hexValue: " + hexValue);
                             System.out.println("hexValueStatus: " + hexValueStatus + "\n");
-                            separateTelltailSignals(canIdSignalsTable_[i], hexValueStatus);
+                            separateFogLampSignals(canIdSignalsTable_[i], hexValueStatus);
                             separateGearSignals(canIdSignalsTable_[i], hexValueStatus);
                             separateVehicleStatusSignals(canIdSignalsTable_[i], hexValue, hexValueStatus);
                             separateDmsSignals(canIdSignalsTable_[i], hexValueStatus);
@@ -806,10 +806,10 @@ public class SignalCANInfo {
                 (myCanID.equals(canID427) && myStartBit.equals(startBitHazard)));
     }
 
-    private static void separateTelltailSignals(String specificID, String hexValueStatus){
+    private static void separateFogLampSignals(String specificID, String hexValueStatus){
         String telltaleLight = "";
 
-        System.out.println("\ndawi_separateTelltailSignals-------------");
+        System.out.println("\ndawi_separateFogLampSignals-------------");
         // System.out.println("Input specificID: " + specificID);
         // System.out.println("Input hexValueStatus: " + hexValueStatus);
 
@@ -919,8 +919,8 @@ public class SignalCANInfo {
            !hexValueStatus.equals(statusDmsOn) && !hexValueStatus.equals(statusDmsOff)
            ){
             factor = 0.05625;
-            maximum = 360;
-            minimum = -100;
+            maximum = 240;   //360
+            minimum = 0;     //-100
             initValue = -100;
             unit = " km/h";
             int speedValues = (int)Math.round(SignalCANInfo_convertHexValueToDecimalValue(hexValue) * factor + initValue);
