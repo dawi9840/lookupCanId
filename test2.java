@@ -141,33 +141,34 @@ public class SignalCANInfo {
      * @return The calculated hexadecimal value.
      ***/
     public static String getCanValue(String canId, String startBit, String length, String[] signalData) {
-        //kuma version
+        // kuma version
         String hexValue = "";
  
         canId = canId.contains("0x") ? canId.replace("0x", "") : canId;
-        String[] string = signalData[0].split(" ");
+        String[] strSignalData = signalData[0].split(" ");
 
-        if (string != null) {
-            int[] arr = new int[string.length];
-            for (int i = 0; i < string.length; i++) { 
-                arr[i] = Integer.decode("0x" + string[i]);
+        if(strSignalData != null) {
+            int[] arr = new int[strSignalData.length];
+            for(int i=0; i<strSignalData.length; i++) { 
+                arr[i] = Integer.decode("0x" + strSignalData[i]);
             }
-            if (string.length >= 12) {
-                //Log.d("kuma", "string= " + " " + string[0] + " " + string[1] + " " + string[2] + " " + string[3]
-                //        + " " + string[4] + " " + string[5] + " " + string[6] + " " + string[7]
-                //        + " " + string[8] + " " + string[9] + " " + string[10] + " " + string[11]);
-                System.arraycopy(arr, 4, canBuffer, 0, arr.length - 4);
-                if (canId.contains("403") && startBit.contains("25")) {
-                    //CDI_PTHVbattStatus1 - ptHMIAvaDrvRange_CDI (里程)
+            if(strSignalData.length >= 12){
+                //Log.d("kuma", "strSignalData= " + " " +  
+                //              strSignalData[0] + " " + strSignalData[1] + " " + strSignalData[2] + " " + strSignalData[3] + " " + 
+                //              strSignalData[4] + " " + strSignalData[5] + " " + strSignalData[6] + " " + strSignalData[7] + " " + 
+                //              strSignalData[8] + " " + strSignalData[9] + " " + strSignalData[10] + " " + strSignalData[11]);
+                System.arraycopy(arr, 4, canBuffer, 0, arr.length-4);
+                if(canId.contains("403") && startBit.contains("25")) {
+                    // CDI_PTHVbattStatus1 - ptHMIAvaDrvRange_CDI (里程)
                     hexValue = hexValue + "0x" + intToHex(canBuffer[3]) + intToHex(canBuffer[4]);
-                } else if (canId.contains("322") && startBit.contains("39")) {
-                    //FBCM_LampCmd - headWHLSpd_FBCM
+                }else if(canId.contains("322") && startBit.contains("39")) {
+                    // FBCM_LampCmd - headWHLSpd_FBCM (車速)
                     byte originalValue = (byte) canBuffer[5];
-                    byte mask = (byte) 0xF8; //掩码 11111000
-                    byte result = (byte) (originalValue & mask);// 将第5位到第7位替换为0
+                    byte mask = (byte) 0xF8; // 掩碼 11111000
+                    byte result = (byte) (originalValue & mask); // 將第5位到第7位替換為0
                     hexValue = hexValue + "0x" + intToHex(canBuffer[4]) + byteToHex(result);
-                } else {
-                    //實際起始位置跟excel檔案描述方式不同
+                }else{
+                    // 實際起始位置跟excel檔案描述方式不同
                     int trueStartBit = Integer.valueOf((Integer.valueOf(startBit) + 1 - (Integer.valueOf(length))));
                     int canValue = (canBuffer[trueStartBit / 8] >>
                             trueStartBit % 8 &
@@ -673,9 +674,9 @@ public class SignalCANInfo {
         // send the string enumerator for QML
         qmlLowBeamLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 0);         // Low_Beam_Light
         qmlHighBeamLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 1);        // High_Beam_Light
-        qmlLeftDirectionLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 3);   //Direction_Light_Left
+        qmlLeftDirectionLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 3);   // Direction_Light_Left
         qmlRightDirectionLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 4);  // Direction_Light_Right
-        qmlHazardLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 6);          //Warning_Light_HAZARD
+        qmlHazardLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 6);          // Warning_Light_HAZARD
         qmlStatusLightOn = SpecificSignalDatasetForQML_testGetLightStatus(0);                         // Opened
         qmlStatusLightOff = SpecificSignalDatasetForQML_testGetLightStatus(1);                        // Closed
     }
@@ -1067,6 +1068,7 @@ public class SignalCANInfo {
         initSpecificCanSeriesTable();
  
         String receivedData = "54 04 00 0A 00 00 00 3E 00 00 00 00;";
+        
         dawi_test(receivedData);
         // test();
     }
