@@ -38,6 +38,19 @@ public class SignalCANInfo {
     private static String startBitRightDirection;
     private static String startBitHazard;
 
+    private static String canID403;
+    private static String startBitSoc;
+    private static String startBitDrivingMileage;
+    private static String lengthSoc;
+    private static String lengthDrivingMileage;
+    private static String strSocValues;
+    private static String strDmValues;
+    private static String unit;
+    private static double factor;
+    private static double maximum;
+    private static double minimum;
+    private static int offset;
+
     private static String statusLightOn;
     private static String statusLightOff;
     private static String statusGearOn;
@@ -53,7 +66,7 @@ public class SignalCANInfo {
     private static String qmlLeftDirectionLight;
     private static String qmlRightDirectionLight;
     private static String qmlHazardLight;
-
+    
     public static int[] canBuffer = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}; // initial value 0
 
     // SignalCANInfo======================================================
@@ -650,6 +663,24 @@ public class SignalCANInfo {
         startBitRightDirection = higRighDirectionSpecificIDParts[1]; // 11
         startBitHazard = hazardSpecificIDParts[1];                   // 42
 
+        idSoc = canIdSignalsTable_[13];            // "0x403, 23, 8",  // 13.Battery level SOC
+        idDrivingMileage = canIdSignalsTable_[14]; // "0x403, 25, 10", // 14.Driving mileage
+        canID403 = "0x403";
+        String[] socSpecificIDParts = idSoc.split(", ");           
+        String[] dmSpecificIDParts = idDrivingMileage.split(", ");
+        startBitSoc = socSpecificIDParts[1];           // 23
+        startBitDrivingMileage = dmSpecificIDParts[1]; // 25
+        lengthSoc = socSpecificIDParts[2];             // 8
+        lengthDrivingMileage = dmSpecificIDParts[2];   // 10
+
+        strSocValues = "";
+        strDmValues = "";
+        unit = "";
+        factor = 0;
+        maximum = 0;
+        minimum = 0;
+        offset = 0;
+
         idFrontFog = canIdSignalsTable_[2];        // "0x215, 43, 1",  // 2.Front fog lamp (on/off)
         idRearFog = canIdSignalsTable_[5];         // "0x217, 41, 1",  // 5.Rear fog light (on/off)
         idGearP = canIdSignalsTable_[7];           // "0x199, 13, 2",  // 7.PRND_P Park light
@@ -658,8 +689,6 @@ public class SignalCANInfo {
         idGearD = canIdSignalsTable_[10];          // "0x199, 19, 2",  // 10.PRND_D Drive light
         idOduTemp = canIdSignalsTable_[11];        // "0x40A, 31, 8",  // 11.Outdoor temperature
         idSpeed = canIdSignalsTable_[12];          // "0x322, 39, 13", // 12.Speed
-        idSoc = canIdSignalsTable_[13];            // "0x403, 23, 8",  // 13.Battery level SOC
-        idDrivingMileage = canIdSignalsTable_[14]; // "0x403, 25, 10", // 14.Driving mileage
         idYaw = canIdSignalsTable_[15];            // "0x700, 18, 1",  // 15.Yaw
         idPhoneCall = canIdSignalsTable_[16];      // "0x700, 19, 1",  // 16.PhoneCall
 
@@ -691,6 +720,8 @@ public class SignalCANInfo {
         String leftDirectionLightStatus = "";
         String rightDirectionLightStatus = "";
         String hazardLightStatus = "";
+        String socStatus = "";
+        String drivingMileageStatus = "";
         String[] dataSets = receivedData.split(";");
 
         for (String dataSet : dataSets) {
@@ -711,8 +742,47 @@ public class SignalCANInfo {
 
                     String hexValue = SignalCANInfo_getHexValue(canIdSignalsTable_[i], signalData);
 
-                    if(LeftAndRightDirectionAndHazardCondition(signalData, myCanID, myStartBit)){
+                    if(socAndtDrivingMileageCondition(signalData, myCanID, myStartBit)){
+                        // System.out.println( i + "0x403_(myCanID, myStartBit): (" + myCanID + ", " + myStartBit + ")");
+
+                        // Caculate hexValueStatus of low/hight beam light status.
+                        if(myStartBit.equals(startBitSoc) && myLength.equals(lengthSoc)){
+                            socStatus = HexValueLookup_getHexValueStatus(canIdSignalsTable_[i], hexValue, correspondingTable_);
+                            System.out.println( "socStatus: " + socStatus + "\n");
+                            if(!socStatus.equals(hexValueTable_[4][0]) && !socStatus.equals(hexValueTable_[4][1])) {
+                                factor = 0.4;
+                                maximum = 100;
+                                minimum = 0;
+                                unit = " %";
+                                int socValues = (int)Math.round(SignalCANInfo_convertHexValueToDecimalValue(hexValue)*factor);
+                                if(socValues>minimum && socValues<=maximum){
+                                    strSocValues = String.valueOf(socValues);
+                                    //invokeSendingSocValueToQt(strSocValues);
+                                    System.out.println("SOC: " + strSocValues + unit + "\n\n");
+                                }
+                            }
+                        }else if(myStartBit.equals(startBitDrivingMileage) && myLength.equals(lengthDrivingMileage)){
+                            drivingMileageStatus = HexValueLookup_getHexValueStatus(canIdSignalsTable_[i], hexValue, correspondingTable_);
+                            System.out.println("drivingMileageStatus: " + drivingMileageStatus + "\n");
+                            if(!drivingMileageStatus.equals(hexValueTable_[5][0]) && !drivingMileageStatus.equals(hexValueTable_[5][1])) {
+                                factor = 1;
+                                maximum = 1023;
+                                minimum = 0;
+                                unit = " km";
+                                int dmValues = (int)Math.round(SignalCANInfo_convertHexValueToDecimalValue(hexValue)*factor);
+                                if(dmValues>minimum && dmValues<=maximum){
+                                    strDmValues = String.valueOf(dmValues);
+                                    //invokeSendingdrivingMileageValueToQt(strDmValues);
+                                    System.out.println("Driving mileage: " + strDmValues + unit + "\n\n");
+                                }
+                            }
+                        }else{//exception
+                            System.out.println("SOC and DM status exception");
+                        }
+
+                    }else if(LeftAndRightDirectionAndHazardCondition(signalData, myCanID, myStartBit)){
                         // System.out.println( i + "0x427_(myCanID, myStartBit): (" + myCanID + ", " + myStartBit + ")");
+
                         // Caculate hexValueStatus of low/hight direction, and hazard light status.
                         if(myStartBit.equals(startBitLeftDirection)){
                             leftDirectionLightStatus = HexValueLookup_getHexValueStatus(canIdSignalsTable_[i], hexValue, correspondingTable_);
@@ -726,25 +796,11 @@ public class SignalCANInfo {
                         }else{//exception
                             System.out.println("left/right and hazard status exception");
                         }
-
-                        // Using hexValueStatus to send command status to QML.
-                        if(leftDirectionLightStatus.equals(statusLedOn)){
-                            // invokeSendToQtSignalChange(qmlLeftDirectionLight, qmlStatusLightOn);
-                            System.out.println( qmlLeftDirectionLight + " is " + qmlStatusLightOn + "!\n");
-                        }else if(rightDirectionLightStatus.equals(statusLedOn)){
-                            // invokeSendToQtSignalChange(qmlRightDirectionLight, qmlStatusLightOn);
-                            System.out.println( qmlRightDirectionLight + " is " + qmlStatusLightOn + "!\n");
-                        }else if(hazardLightStatus.equals(statusLedOn)){
-                            // invokeSendToQtSignalChange(qmlHazardLight, qmlStatusLightOn);
-                            System.out.println( qmlHazardLight + " is " + qmlStatusLightOn + "!\n");
-                        }else{
-                            // invokeSendToQtSignalChange(qmlHazardLight, qmlStatusLightOff);
-                            System.out.println( "All " + qmlLowBeamLight + " ," + 
-                            qmlHighBeamLight + " ,and " +qmlHazardLight+ " are " + qmlStatusLightOff + "!\n");
-                        }
+                        sendLRDirectionAndHazardLightsToQML(leftDirectionLightStatus, rightDirectionLightStatus, hazardLightStatus);
 
                     }else if(lowBeamAndHighBeamLightsCondition(signalData, myCanID, myStartBit)){
                         //System.out.println( i + "0x217_(myCanID, myStartBit): (" + myCanID + ", " + myStartBit + ")");
+                        
                         // Caculate hexValueStatus of low/hight beam light status.
                         if(myStartBit.equals(startBitLowBeam)){// low beam
                             lowBeanLightStatus = HexValueLookup_getHexValueStatus(canIdSignalsTable_[i], hexValue, correspondingTable_);
@@ -755,18 +811,7 @@ public class SignalCANInfo {
                         }else{//exception
                             System.out.println("low/high beam status exception");
                         }
-
-                        // Using hexValueStatus to send command status to QML.
-                        if(lowBeanLightStatus.equals(statusLightOn)) {
-                            // invokeSendToQtSignalChange(qmlLowBeamLight, qmlStatusLightOn);
-                            System.out.println( qmlLowBeamLight + " is " + qmlStatusLightOn + "!\n");
-                        }else if(highBeanLightStatus.equals(statusLightOn)) {
-                            // invokeSendToQtSignalChange(qmlHighBeamLight, qmlStatusLightOn);
-                            System.out.println( qmlHighBeamLight + " is " + qmlStatusLightOn + "!\n");
-                        }else{
-                            // invokeSendToQtSignalChange(qmlHighBeamLight, qmlStatusLightOff);
-                            System.out.println( "Both " + qmlLowBeamLight + " and " + qmlHighBeamLight + " are " + qmlStatusLightOff + "!\n");
-                        }
+                        sendLowAndHighBeamLightsToQML(lowBeanLightStatus, highBeanLightStatus);
 
                     }else if(signalData[1].equals(myCanID)){
                         // System.out.println("dawi test other canID block");
@@ -794,6 +839,12 @@ public class SignalCANInfo {
         }
     }
 
+    private static boolean socAndtDrivingMileageCondition(String[] signalData, String myCanID, String myStartBit){
+        return signalData[1].equals(canID403) && 
+                ((myCanID.equals(canID403) && myStartBit.equals(startBitSoc)) || 
+                (myCanID.equals(canID403) && myStartBit.equals(startBitDrivingMileage)));
+    }
+
     private static boolean lowBeamAndHighBeamLightsCondition(String[] signalData, String myCanID, String myStartBit){
         return signalData[1].equals(canID217) && 
                 ((myCanID.equals(canID217) && myStartBit.equals(startBitLowBeam)) || 
@@ -805,6 +856,37 @@ public class SignalCANInfo {
                 ((myCanID.equals(canID427) && myStartBit.equals(startBitLeftDirection)) || 
                 (myCanID.equals(canID427) && myStartBit.equals(startBitRightDirection)) ||
                 (myCanID.equals(canID427) && myStartBit.equals(startBitHazard)));
+    }
+
+    private static void sendLRDirectionAndHazardLightsToQML(String leftDirectionLightStatus, String rightDirectionLightStatus, String hazardLightStatus){
+        // Using hexValueStatus to send command status to QML.
+        if(leftDirectionLightStatus.equals(statusLedOn)){
+            // invokeSendToQtSignalChange(qmlLeftDirectionLight, qmlStatusLightOn);
+            System.out.println( qmlLeftDirectionLight + " is " + qmlStatusLightOn + "!\n");
+        }else if(rightDirectionLightStatus.equals(statusLedOn)){
+            // invokeSendToQtSignalChange(qmlRightDirectionLight, qmlStatusLightOn);
+            System.out.println( qmlRightDirectionLight + " is " + qmlStatusLightOn + "!\n");
+        }else if(hazardLightStatus.equals(statusLedOn)){
+            // invokeSendToQtSignalChange(qmlHazardLight, qmlStatusLightOn);
+            System.out.println( qmlHazardLight + " is " + qmlStatusLightOn + "!\n");
+        }else{
+            // invokeSendToQtSignalChange(qmlHazardLight, qmlStatusLightOff);
+            System.out.println( "All " + qmlLowBeamLight + " ," + 
+            qmlHighBeamLight + " ,and " +qmlHazardLight+ " are " + qmlStatusLightOff + "!\n");
+        }
+    }
+
+    private static void sendLowAndHighBeamLightsToQML(String lowBeanLightStatus, String highBeanLightStatus){
+        if(lowBeanLightStatus.equals(statusLightOn)) {
+            // invokeSendToQtSignalChange(qmlLowBeamLight, qmlStatusLightOn);
+            System.out.println( qmlLowBeamLight + " is " + qmlStatusLightOn + "!\n");
+        }else if(highBeanLightStatus.equals(statusLightOn)) {
+            // invokeSendToQtSignalChange(qmlHighBeamLight, qmlStatusLightOn);
+            System.out.println( qmlHighBeamLight + " is " + qmlStatusLightOn + "!\n");
+        }else{
+            // invokeSendToQtSignalChange(qmlHighBeamLight, qmlStatusLightOff);
+            System.out.println( "Both " + qmlLowBeamLight + " and " + qmlHighBeamLight + " are " + qmlStatusLightOff + "!\n");
+        }
     }
 
     private static void separateFogLampSignals(String specificID, String hexValueStatus){
@@ -872,14 +954,14 @@ public class SignalCANInfo {
     private static void separateVehicleStatusSignals(String specificID, String hexValue, String hexValueStatus){
         String strOduValues = "";
         String strSpeedValues = "";
-        String strSocValues = "";
-        String strDmValues = "";
+        // String strSocValues = "";
+        // String strDmValues = "";
         
-        String unit = "";
-        double factor = 0;
-        double maximum = 0;
-        double minimum = 0;
-        int offset = 0;
+        // String unit = "";
+        // double factor = 0;
+        // double maximum = 0;
+        // double minimum = 0;
+        // int offset = 0;
         int initValue = 0;
         
         System.out.println("\ndawi_separateVehicleStatusSignals-------------");
@@ -930,8 +1012,8 @@ public class SignalCANInfo {
                 System.out.println("Speed: " + strSpeedValues + unit + "\n\n");
             }
         }
-
-        /* 13.Battery level SOC */
+/*
+        // 13.Battery level SOC
         if(specificID.equals(idSoc) &&
            !hexValueStatus.equals(statusLightOn) && !hexValueStatus.equals(statusLightOff) &&
            !hexValueStatus.equals(hexValueTable_[1][0]) && !hexValueStatus.equals(hexValueTable_[1][1]) &&
@@ -952,7 +1034,7 @@ public class SignalCANInfo {
             }
         }
 
-        /* 14.Driving mileage */
+        // 14.Driving mileage
         if(specificID.equals(idDrivingMileage) &&
            !hexValueStatus.equals(statusLightOn) && !hexValueStatus.equals(statusLightOff) &&
            !hexValueStatus.equals(hexValueTable_[1][0]) && !hexValueStatus.equals(hexValueTable_[1][1]) &&
@@ -972,7 +1054,7 @@ public class SignalCANInfo {
                 System.out.println("Driving mileage: " + strDmValues + unit + "\n\n");
             }
         }
-
+*/
         if(!strOduValues.equals("") && !strSpeedValues.equals("") &&
            !strSocValues.equals("") && !strDmValues.equals("")){
             System.out.println("Input specificID: " + specificID);
@@ -1067,7 +1149,7 @@ public class SignalCANInfo {
     public static void main(String[] args) {
         initSpecificCanSeriesTable();
  
-        String receivedData = "54 04 00 0A 00 00 00 3E 00 00 00 00;";
+        String receivedData = "54 04 00 03 00 00 00 02 8A 00 00 00;54 04 00 03 00 00 C5 00 00 00 00 00;";
         
         dawi_test(receivedData);
         // test();
