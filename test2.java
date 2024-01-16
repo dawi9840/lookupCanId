@@ -954,15 +954,18 @@ public class SignalCANInfo {
     private static void separateVehicleStatusSignals(String specificID, String hexValue, String hexValueStatus){
         String strOduValues = "";
         String strSpeedValues = "";
-        // String strSocValues = "";
-        // String strDmValues = "";
-        
-        // String unit = "";
-        // double factor = 0;
-        // double maximum = 0;
-        // double minimum = 0;
-        // int offset = 0;
         int initValue = 0;
+
+/*
+        String strSocValues = "";
+        String strDmValues = "";
+        
+        String unit = "";
+        double factor = 0;
+        double maximum = 0;
+        double minimum = 0;
+        int offset = 0;
+*/        
         
         System.out.println("\ndawi_separateVehicleStatusSignals-------------");
         // System.out.println("Input specificID: " + specificID);
@@ -1148,10 +1151,11 @@ public class SignalCANInfo {
 
     public static void main(String[] args) {
         initSpecificCanSeriesTable();
- 
+        //54 04 02 07 00 00 40 00 00 00 00 00
         String receivedData = "54 04 00 03 00 00 00 02 8A 00 00 00;54 04 00 03 00 00 C5 00 00 00 00 00;";
         
         dawi_test(receivedData);
+        //V2
         // test();
     }
 }
