@@ -6,11 +6,13 @@ import java.util.HashMap;
 
 
 public class SignalCANInfo {
+    // Define the receiving CAN series signals mode and table
     private static int selectMode = 3; // [3]: telltale, vehicle and DMS status.
     private static String[] canIdSignalsTable_;
     private static String[][] hexValueTable_;
     private static Map<String, String[]> correspondingTable_;
 
+    // Define specific canSingal infos
     private static String idLowBeam;
     private static String idHighBeam;
     private static String idFrontFog;
@@ -29,20 +31,28 @@ public class SignalCANInfo {
     private static String idYaw;
     private static String idPhoneCall;
 
+    // Define specific canID
+    private static String canID215;
     private static String canID217;
+    private static String canID427;
+    private static String canID403;
+
+    // Define specific startBit
+    private static String startBitFrontFog;
     private static String startBitLowBeam;
     private static String startBitHighBeam;
-
-    private static String canID427;
+    private static String startBitRearFog;
     private static String startBitLeftDirection;
     private static String startBitRightDirection;
     private static String startBitHazard;
-
-    private static String canID403;
     private static String startBitSoc;
     private static String startBitDrivingMileage;
+
+    // Define specific length
     private static String lengthSoc;
     private static String lengthDrivingMileage;
+
+    // Define vehicle status
     private static String strSocValues;
     private static String strDmValues;
     private static String unit;
@@ -51,6 +61,7 @@ public class SignalCANInfo {
     private static double minimum;
     private static int offset;
 
+    // Define hexValueStatus
     private static String statusLightOn;
     private static String statusLightOff;
     private static String statusGearOn;
@@ -59,6 +70,7 @@ public class SignalCANInfo {
     private static String statusLedOn;
     private static String statusLedOff;
 
+    // Define specific string enumerator for QML
     private static String qmlStatusLightOn;
     private static String qmlStatusLightOff;
     private static String qmlLowBeamLight;
@@ -66,7 +78,9 @@ public class SignalCANInfo {
     private static String qmlLeftDirectionLight;
     private static String qmlRightDirectionLight;
     private static String qmlHazardLight;
-    
+    private static String qmlFrontFogLight;
+    private static String qmlRearFogLight;
+
     public static int[] canBuffer = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}; // initial value 0
 
     // SignalCANInfo======================================================
@@ -112,6 +126,39 @@ public class SignalCANInfo {
         // System.out.println("canData: " + canData + "\n----------\n");
 
         return new String[] { signalInfo, canID, canData };
+    }
+
+    /**
+     * Extracts the CAN-specific ID from the given signal ID.
+     *
+     * @param inputASingalId A string containing signal ID information separated by ', '.
+     * @return The CAN-specific ID extracted from the input signal ID.
+     */
+    private static String SignalCANInfo_getCanSpecificCanId(String inputASingalId) {
+        String[] specificIDParts = inputASingalId.split(", ");
+        return specificIDParts[0];
+    }
+
+    /**
+     * Extracts the CAN-specific start bit from the given signal ID.
+     *
+     * @param inputASingalId A string containing signal ID information separated by ', '.
+     * @return The CAN-specific start bit extracted from the input signal ID.
+     */
+    private static String SignalCANInfo_getCanSpecificStartBit(String inputASingalId) {
+        String[] specificIDParts = inputASingalId.split(", ");
+        return specificIDParts[1];
+    }
+
+    /**
+     * Extracts the CAN-specific length from the given signal ID.
+     *
+     * @param inputASingalId A string containing signal ID information separated by ', '.
+     * @return The CAN-specific length extracted from the input signal ID.
+     */
+    private static String SignalCANInfo_getCanSpecificLength(String inputASingalId) {
+        String[] specificIDParts = inputASingalId.split(", ");
+        return specificIDParts[2];
     }
 
     /***
@@ -640,49 +687,22 @@ public class SignalCANInfo {
 
     // =================================================================================
     public static void initSpecificCanSeriesTable(){
+        // Extract the receiving CAN series signals mode and table
         canIdSignalsTable_ = SpecificCanIdDataset_getSpecificCanIdDatasets(selectMode);
         hexValueTable_ = HexValueLookup_gethexValueTable(selectMode);
         correspondingTable_ = HexValueLookup_getCorrespondingTable(canIdSignalsTable_, hexValueTable_, selectMode);
         
+        // Extract specific canSingal infos from canIdSignalsTable.
         idLowBeam = canIdSignalsTable_[0];         // "0x217, 18, 1",  // 0.Low beam (on/off)
         idHighBeam = canIdSignalsTable_[1];        // "0x217, 17, 1",  // 1.High beam (on/off)
-        String[] lowBeamSpecificIDParts = idLowBeam.split(", ");
-        String[] highBeamSpecificIDParts = idHighBeam.split(", ");
-        canID217= "0x217";
-        startBitLowBeam = lowBeamSpecificIDParts[1];   // 18
-        startBitHighBeam = highBeamSpecificIDParts[1]; // 17
-
+        idFrontFog = canIdSignalsTable_[2];        // "0x215, 43, 1",  // 2.Front fog lamp (on/off)
+        idRearFog = canIdSignalsTable_[5];         // "0x217, 41, 1",  // 5.Rear fog light (on/off)
         idLeftDirection = canIdSignalsTable_[3];   // "0x427, 13, 2",  // 3.Left direction light (on/off)
         idRightDirection = canIdSignalsTable_[4];  // "0x427, 11, 2",  // 4.Right direction light (on/off)
         idHazard = canIdSignalsTable_[6];          // "0x427, 42, 2",  // 6.Warning light HAZARD (on/off)
-        canID427 = "0x427";
-        String[] leftDirectionSpecificIDParts = idLeftDirection.split(", ");
-        String[] higRighDirectionSpecificIDParts = idRightDirection.split(", ");
-        String[] hazardSpecificIDParts = idHazard.split(", ");
-        startBitLeftDirection = leftDirectionSpecificIDParts[1];     // 13
-        startBitRightDirection = higRighDirectionSpecificIDParts[1]; // 11
-        startBitHazard = hazardSpecificIDParts[1];                   // 42
-
         idSoc = canIdSignalsTable_[13];            // "0x403, 23, 8",  // 13.Battery level SOC
         idDrivingMileage = canIdSignalsTable_[14]; // "0x403, 25, 10", // 14.Driving mileage
-        canID403 = "0x403";
-        String[] socSpecificIDParts = idSoc.split(", ");           
-        String[] dmSpecificIDParts = idDrivingMileage.split(", ");
-        startBitSoc = socSpecificIDParts[1];           // 23
-        startBitDrivingMileage = dmSpecificIDParts[1]; // 25
-        lengthSoc = socSpecificIDParts[2];             // 8
-        lengthDrivingMileage = dmSpecificIDParts[2];   // 10
 
-        strSocValues = "";
-        strDmValues = "";
-        unit = "";
-        factor = 0;
-        maximum = 0;
-        minimum = 0;
-        offset = 0;
-
-        idFrontFog = canIdSignalsTable_[2];        // "0x215, 43, 1",  // 2.Front fog lamp (on/off)
-        idRearFog = canIdSignalsTable_[5];         // "0x217, 41, 1",  // 5.Rear fog light (on/off)
         idGearP = canIdSignalsTable_[7];           // "0x199, 13, 2",  // 7.PRND_P Park light
         idGearR = canIdSignalsTable_[8];           // "0x199, 15, 2",  // 8.PRND_R Reverse light
         idGearN = canIdSignalsTable_[9];           // "0x199, 17, 2",  // 9.PRND_N Neutral light
@@ -692,6 +712,37 @@ public class SignalCANInfo {
         idYaw = canIdSignalsTable_[15];            // "0x700, 18, 1",  // 15.Yaw
         idPhoneCall = canIdSignalsTable_[16];      // "0x700, 19, 1",  // 16.PhoneCall
 
+        // Extract specific canID
+        canID217= SignalCANInfo_getCanSpecificCanId(idLowBeam);        // 0x217
+        canID427 = SignalCANInfo_getCanSpecificCanId(idLeftDirection); // 0x427
+        canID403 = SignalCANInfo_getCanSpecificCanId(idSoc);           // 0x403
+        canID215 = SignalCANInfo_getCanSpecificCanId(idFrontFog);      // 0x215
+
+        // Extract specific startBit
+        startBitLowBeam = SignalCANInfo_getCanSpecificStartBit(idLowBeam);                // 18
+        startBitHighBeam = SignalCANInfo_getCanSpecificStartBit(idHighBeam);              // 17
+        startBitLeftDirection = SignalCANInfo_getCanSpecificStartBit(idLeftDirection);    // 13
+        startBitRightDirection = SignalCANInfo_getCanSpecificStartBit(idRightDirection);  // 11
+        startBitHazard = SignalCANInfo_getCanSpecificStartBit(idHazard);                  // 42
+        startBitSoc = SignalCANInfo_getCanSpecificStartBit(idSoc);                        // 23
+        startBitDrivingMileage = SignalCANInfo_getCanSpecificStartBit(idDrivingMileage);  // 25
+        startBitFrontFog = SignalCANInfo_getCanSpecificStartBit(idFrontFog);              // 43
+        startBitRearFog = SignalCANInfo_getCanSpecificStartBit(idRearFog);                // 41
+
+        // Extract specific length
+        lengthSoc = SignalCANInfo_getCanSpecificLength(idSoc);                            // 8
+        lengthDrivingMileage =SignalCANInfo_getCanSpecificLength(idDrivingMileage);       // 10
+        
+        // Vehicle status
+        strSocValues = "";
+        strDmValues = "";
+        unit = "";
+        factor = 0;
+        maximum = 0;
+        minimum = 0;
+        offset = 0;
+        
+        // Extract hexValueStatus
         statusLightOn = hexValueTable_[0][0];      // 0x1=On, Telltale Status: on status
         statusLightOff = hexValueTable_[0][1];     // 0x0=Off, Telltale Status: off status
         statusLedOn = hexValueTable_[7][2];        // 0x1=LED On, For 0x427 light on status
@@ -700,14 +751,21 @@ public class SignalCANInfo {
         statusDmsOn = hexValueTable_[6][0];        // 0x1=Alarm
         statusDmsOff = hexValueTable_[6][1];       // 0x0=NotAlarm
 
-        // send the string enumerator for QML
+        // send the specific string enumerator for QML
         qmlLowBeamLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 0);         // Low_Beam_Light
         qmlHighBeamLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 1);        // High_Beam_Light
         qmlLeftDirectionLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 3);   // Direction_Light_Left
         qmlRightDirectionLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 4);  // Direction_Light_Right
         qmlHazardLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 6);          // Warning_Light_HAZARD
+        qmlFrontFogLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 2);        // Fog_Light_Front
+        qmlRearFogLight = SpecificSignalDatasetForQML_testGetSpecificSignal(0, 5);         // Fog_Light_Rear
+
         qmlStatusLightOn = SpecificSignalDatasetForQML_testGetLightStatus(0);                         // Opened
         qmlStatusLightOff = SpecificSignalDatasetForQML_testGetLightStatus(1);                        // Closed
+
+        // Default to turn on the Daytime Running Light
+        //invokeSendToQtSignalChange(qmlLowBeamLight, qmlStatusLightOn);
+        //invokeSendToQtSignalChange(qmlHighBeamLight, qmlStatusLightOff);
     }
 
     private static void dawi_test(String receivedData){
